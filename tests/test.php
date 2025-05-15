@@ -10,7 +10,8 @@ $handler = function ($telegram, $update) {
     $message = $update->getMessage()->reply('收到');
     echo "Handler executed.";
 };
-$bot = new TelegramBot('5601845467:AAH_UgYNHj-ql9BXmGPVeIBfPx5ekX0u7oQ');
+$bot = new TelegramBot('5601845467:AAGW1UpUpK3ZoTcxCuFyfYbLUf3rxonlWeQ');
+
 $bot->add_handlers(
     new MiddlewareHandlers([
         new MiddlewareHandler($handler)
