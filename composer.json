@@ -1,0 +1,15 @@
+{
+  "name": "telegram/telegram-bot-php",
+  "description": "你的项目描述",
+  "type": "library",
+  "license": "MIT",
+  "autoload": {
+    "psr-4": {
+      "telegram\\bot\\": "src/telegram/bot"
+    }
+  },
+  "require": {
+    "php": ">=8.0",
+    "irazasyed/telegram-bot-sdk": "^3.14"
+  }
+}
