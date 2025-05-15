@@ -1,2 +1,36 @@
-vendor
+# 忽略 composer 安装的依赖
+/vendor/
+
+# 忽略 composer 生成的锁文件（可选保留）
+# /composer.lock
+
+# 忽略操作系统文件
+.DS_Store
+Thumbs.db
+
+# 忽略 PHPStorm / VSCode / Sublime 等 IDE 设置文件
+/.idea/
+/.vscode/
+/*.sublime-project
+/*.sublime-workspace
+
+# 忽略日志和缓存
 *.log
+*.cache
+/storage/logs/
+/storage/cache/
+/tmp/
+/temp/
+
+# 忽略测试覆盖率、构建和文档缓存
+/.coverage/
+/.phpunit.result.cache
+/build/
+/docs/_build/
+
+# 忽略环境配置（如 .env）
+.env
+.env.*
+
+# 忽略 PHPUnit 配置缓存
+.phpunit.result.cache
