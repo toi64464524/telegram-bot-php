@@ -34,3 +34,4 @@ Thumbs.db
 
 # 忽略 PHPUnit 配置缓存
 .phpunit.result.cache
+tests

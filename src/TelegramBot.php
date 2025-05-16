@@ -31,19 +31,24 @@ class TelegramBot extends Api
     public array $chat_data;
     public array $user_data;
     private int $update_id;
+    public int $id;
+    public string $token;
 
     public function __construct(string $token)
     {
         parent::__construct($token);
         $this->state_handler=null;
-        // $this->keyboard_markup = null;
         $this->handlers = [];
         $this->middleware_handlers = [];
-        // $this->chat_data = [];
+        $this->id = (int) explode(":", $token)[0];
+        $this->token = $token;
         $this->update_id = 1;
     }
 
-    public function __init() {}
+    public function __init() 
+    {
+        // 让子类定义
+    }
 
     public function edit_message(int $chat_id, int $message_id, array $params)
     {
