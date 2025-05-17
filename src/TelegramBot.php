@@ -6,6 +6,7 @@ use Telegram\Bot\Api;
 
 use telegram\bot\types\Update;
 use telegram\bot\types\Filters;
+use telegram\bot\types\Handlers;
 use telegram\bot\types\InlineCallbackHandler;
 use telegram\bot\types\InlineCallbackHandlers;
 use telegram\bot\types\MessageHandler;
@@ -94,48 +95,39 @@ class TelegramBot extends Api
     public function add_handler(MiddlewareHandler|StateHandler|InlineCallbackHandler|MessageHandler|KeyboardHandler|CommandHandler $handler)
     {
         if ($handler instanceof CommandHandler) {
-            array_push($this->command_handlers, $handler->handler);
+            array_push($this->command_handlers, $handler);
+
         } else if ($handler instanceof KeyboardHandler) {
-            // array_push($this->handlers, $handler->handler);
-            array_push($this->command_handlers, $handler->handler);
+            array_push($this->command_handlers, $handler);
+
         } else if ($handler instanceof InlineCallbackHandler) {
-            array_push($this->handlers, $handler->handler);
+            array_push($this->handlers, $handler);
+
         } else if ($handler instanceof MessageHandler) {
-            array_push($this->handlers, $handler->handler);
+            array_push($this->handlers, $handler);
+
         } else if ($handler instanceof MiddlewareHandler) {
-            array_push($this->middleware_handlers, $handler->handler);
+            array_push($this->middleware_handlers, $handler);
+
         } else if ($handler instanceof StateHandler) {
             $this->state_handler = $handler;
         }
+
         usort($this->middleware_handlers, function($a, $b) {
-            return $a->group <=> $b->group; 
+            return $a->group <=> $b->group;
         });
+
         usort($this->handlers, function($a, $b) {
             return $a->group <=> $b->group; 
         });
     }
 
-    public function add_handlers(MiddlewareHandlers|InlineCallbackHandlers|MessageHandlers|KeyboardHandlers|CommandHandlers $handlers)
+    public function add_handlers(Handlers $handlers)
     {
-        if ($handlers instanceof CommandHandlers) {
-            $this->command_handlers = array_merge($this->command_handlers, $handlers->handlers);
-        } else if ($handlers instanceof KeyboardHandlers) {
-            // $this->handlers = array_merge($this->handlers, $handlers->handlers);
-            $this->command_handlers = array_merge($this->command_handlers, $handlers->handlers);
-        } else if ($handlers instanceof InlineCallbackHandlers) {
-            $this->handlers = array_merge($this->handlers, $handlers->handlers);
-        } else if ($handlers instanceof MessageHandlers) {
-            $this->handlers = array_merge($this->handlers, $handlers->handlers);
-        } else if ($handlers instanceof MiddlewareHandlers) {
-            $this->middleware_handlers = array_merge($this->middleware_handlers, $handlers->handlers);
+        foreach ($handlers->handlers as $handler) {
+            var_dump($handler);
+            $this->add_handler($handler);
         }
-        usort($this->middleware_handlers, function($a, $b) {
-            return $a->group <=> $b->group; 
-        });
-
-        usort($this->handlers, function($a, $b) {
-            return $a->group <=> $b->group; 
-        });
     }
     
     public function getUpdates(array $options = [], bool $shouldDispatchEvents = true): array
@@ -153,6 +145,7 @@ class TelegramBot extends Api
             ->all();
     }
 
+    // 循环处理消息
     public function run(array $options=[])
     {
         empty($options['limit']) && $options['limit'] = 100;

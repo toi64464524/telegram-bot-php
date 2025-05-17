@@ -2,24 +2,10 @@
 
 namespace telegram\bot\types;
 
-class MessageHandlers
+class MessageHandlers extends Handlers
 {
-    public array $handlers;
-
-    public function __construct(array $handlers) {
-        $this->handlers =[];
-
-        foreach($handlers as $handler) {
-            if ($handler instanceof MessageHandler) {
-                array_push($this->handlers, $handler);
-            }else {
-                throw new \Exception("MessageHandlers 只能是 MessageHandler 类"); 
-            }
-        }
-    }
-
-    public function add(MessageHandler $handler) {
-        if (!$handler instanceof MessageHandler) {
+    public function add( $handler) {
+        if ($handler instanceof MessageHandler) {
             array_push($this->handlers, $handler);
         }else {
             throw new \Exception("MessageHandlers 只能是 MessageHandler 类"); 

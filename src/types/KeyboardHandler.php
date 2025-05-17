@@ -2,7 +2,8 @@
 
 namespace telegram\bot\types;
 
-class KeyboardHandler {
+class KeyboardHandler 
+{
     public string $command;
     public int $group;
     public Filters $filters;
