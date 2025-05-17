@@ -8,10 +8,14 @@ use telegram\bot\types\MessageHandler;
 use telegram\bot\types\MessageHandlers;
 use telegram\bot\types\MiddlewareHandlers;
 use telegram\bot\types\MiddlewareHandler;
+use telegram\bot\types\InlineCallbackKeyboardButton;
+
+
+$botton = new InlineCallbackKeyboardButton('text', ['callback_data' =>'123']);
 
 $handler = function ($telegram, $update) {
     $message = $update->getMessage()->reply('收到',[
-        
+
     ]);
     echo "Handler executed.";
 };
