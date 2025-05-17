@@ -35,7 +35,7 @@ class Filters
             }
 
             if (@preg_match($filter, '') !== false) {
-                array_push($this->filters, ['key' => 'regex', 'is_reverse' => $is_reverse, 'method' => $this->map['regex'], 'pattern' => $key]);
+                array_push($this->filters, ['key' => 'regex', 'is_reverse' => $is_reverse, 'method' => $this->map['regex'], 'pattern' => $filter]);
             } else if (isset($this->map[$key]) && method_exists($this->map[$key][0], $this->map[$key][1])) {
                 array_push($this->filters, ['key' => $key, 'is_reverse' => $is_reverse, 'method' => $this->map[$key]]);
             }else{
@@ -47,14 +47,14 @@ class Filters
     public function handler($update)
     {
         foreach($this->filters as $filter) {
-            var_dump($filter);
+            // var_dump($filter);
             $is_reverse = $filter['is_reverse'];
             if ($filter['key'] === 'regex') {
                 $result = call_user_func($filter['method'], $update, $filter['pattern']);
             } else {
                 $result = call_user_func($filter['method'], $update);
             }
-            var_dump($result);
+            // var_dump($result);
             if ($is_reverse === $result) {
                 return false;
             }

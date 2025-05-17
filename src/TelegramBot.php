@@ -27,6 +27,7 @@ class TelegramBot extends Api
     public ?KeyboardMarkup $keyboard_markup;
     public ?StateHandler $state_handler;
     public array $middleware_handlers;
+    public array $command_handlers;
     public array $handlers;
     public array $chat_data;
     public array $user_data;
@@ -40,6 +41,7 @@ class TelegramBot extends Api
         $this->state_handler=null;
         $this->handlers = [];
         $this->middleware_handlers = [];
+        $this->command_handlers  = [];
         $this->id = (int) explode(":", $token)[0];
         $this->token = $token;
         $this->update_id = 1;
@@ -74,6 +76,7 @@ class TelegramBot extends Api
         if ($markup){
             $params['reply_markup'] = $markup->make();
         }
+
         return parent::sendMessage($params);
     }
 
@@ -91,9 +94,10 @@ class TelegramBot extends Api
     public function add_handler(MiddlewareHandler|StateHandler|InlineCallbackHandler|MessageHandler|KeyboardHandler|CommandHandler $handler)
     {
         if ($handler instanceof CommandHandler) {
-            array_push($this->handlers, $handler->handler);
+            array_push($this->command_handlers, $handler->handler);
         } else if ($handler instanceof KeyboardHandler) {
-            array_push($this->handlers, $handler->handler);
+            // array_push($this->handlers, $handler->handler);
+            array_push($this->command_handlers, $handler->handler);
         } else if ($handler instanceof InlineCallbackHandler) {
             array_push($this->handlers, $handler->handler);
         } else if ($handler instanceof MessageHandler) {
@@ -114,10 +118,10 @@ class TelegramBot extends Api
     public function add_handlers(MiddlewareHandlers|InlineCallbackHandlers|MessageHandlers|KeyboardHandlers|CommandHandlers $handlers)
     {
         if ($handlers instanceof CommandHandlers) {
-            $this->handlers = array_merge($this->handlers, $handlers->handlers);
-            // $this->setMyCommands($handlers->commands);
+            $this->command_handlers = array_merge($this->command_handlers, $handlers->handlers);
         } else if ($handlers instanceof KeyboardHandlers) {
-            $this->handlers = array_merge($this->handlers, $handlers->handlers);
+            // $this->handlers = array_merge($this->handlers, $handlers->handlers);
+            $this->command_handlers = array_merge($this->command_handlers, $handlers->handlers);
         } else if ($handlers instanceof InlineCallbackHandlers) {
             $this->handlers = array_merge($this->handlers, $handlers->handlers);
         } else if ($handlers instanceof MessageHandlers) {
@@ -125,10 +129,10 @@ class TelegramBot extends Api
         } else if ($handlers instanceof MiddlewareHandlers) {
             $this->middleware_handlers = array_merge($this->middleware_handlers, $handlers->handlers);
         }
-        
         usort($this->middleware_handlers, function($a, $b) {
             return $a->group <=> $b->group; 
         });
+
         usort($this->handlers, function($a, $b) {
             return $a->group <=> $b->group; 
         });
@@ -160,8 +164,9 @@ class TelegramBot extends Api
                     $this->update_id = $update->update_id;
                     $this->exec_handlers($update);
                 }
-            } catch (\Exception $th) {
+            } catch (\Exception $e) {
                 // Log::error($th);
+                var_dump($e->getMessage());
             }
             
         }
@@ -179,6 +184,13 @@ class TelegramBot extends Api
         // 中间件控制器
         var_dump("匹配中间件控制器");
         $state = $this->_handler_handlers($update, $this->middleware_handlers, $state_id);
+        if ($state) {
+            return;
+        }
+
+        // 命令控制器
+        var_dump("匹配命令控制器");
+        $state = $this->_handler_handlers($update, $this->command_handlers, $state_id);
         if ($state) {
             return;
         }

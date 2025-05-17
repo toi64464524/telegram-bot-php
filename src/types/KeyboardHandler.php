@@ -13,7 +13,7 @@ class KeyboardHandler {
     {
         $this->command = $command;
         $this->group = $group;
-        $this->filters = new Filters(["/^{$command}$/"]);
+        $this->filters = new Filters(["/^{$command}$/", 'is_message']);
         $this->handler = $handler;
     }
 }

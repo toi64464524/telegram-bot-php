@@ -12,5 +12,6 @@ class MessageHandler
         $this->group = $group;
         $this->filters = $filters;
         $this->handler = $handler;
+        $this->filters->add(['is_message']);
     }
 }

@@ -16,6 +16,5 @@ class InlineCallbackHandler
         $this->group = $group;
         $this->filters = $filters;
         $this->handler = $handler;
-
     }
 }

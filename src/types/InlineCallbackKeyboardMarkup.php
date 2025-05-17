@@ -4,10 +4,15 @@ namespace telegram\bot\types;
 
 class InlineCallbackKeyboardMarkup
 {
-    public array $rows;
+    public array $rows; // [InlineCallbackKeyboardRow]
     
     public function __construct(array $rows=[]) 
     {
+        foreach ($rows as $row) {
+            if (!$row instanceof InlineCallbackKeyboardRow) {
+                throw new \Exception('按键类型错误');
+            }
+        }
         $this->rows = $rows;
     }
 
@@ -21,9 +26,11 @@ class InlineCallbackKeyboardMarkup
         $keyboard = [];
         foreach ($this->rows as $row) {
             $keyboard_row = [];
-            foreach ($row as $button) {
-                if ($button && $button->data) {
-                    array_push($keyboard_row, $button->data);
+            foreach ($row as $buttons) {
+                foreach($buttons as $button) {
+                    if ($button && $button->make()) {
+                        array_push($keyboard_row, $button->make());
+                    }
                 }
             }
 
