@@ -22,8 +22,8 @@ class InlineCallbackKeyboardMarkup
         foreach ($this->rows as $row) {
             $keyboard_row = [];
             foreach ($row as $button) {
-                if ($button) {
-                    array_push($keyboard_row, $button);
+                if ($button && $button->data) {
+                    array_push($keyboard_row, $button->data);
                 }
             }
 

@@ -47,13 +47,14 @@ class Filters
     public function handler($update)
     {
         foreach($this->filters as $filter) {
+            var_dump($filter);
             $is_reverse = $filter['is_reverse'];
             if ($filter['key'] === 'regex') {
                 $result = call_user_func($filter['method'], $update, $filter['pattern']);
             } else {
                 $result = call_user_func($filter['method'], $update);
             }
-
+            var_dump($result);
             if ($is_reverse === $result) {
                 return false;
             }
@@ -101,7 +102,7 @@ class Filters
 
     public static function regex(Update $update, string $pattern): bool
     {
-        var_dump("regex 判断：", preg_match($pattern, $update->getMessage()->text), $pattern, $update->getMessage()->text);
+        // var_dump("regex 判断：", preg_match($pattern, $update->getMessage()->text), $pattern, $update->getMessage()->text);
         if ($update->isType('callback_query') && preg_match($pattern, $update->getCallbackQuery()->data)) {
             return true;
         }else if ($update->isType('message') && preg_match($pattern, $update->getMessage()->text)) {

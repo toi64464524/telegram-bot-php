@@ -9,12 +9,12 @@ class InlineCallbackHandlers
     public function __construct(array $handlers=[]) 
     {
         $this->handlers = [];
-        foreach ($handlers as $line) {
-            foreach ($line as $handler) {
+        foreach ($handlers as $handler) {
+            // foreach ($line as $handler) {
                 if ($handler instanceof InlineCallbackHandler) {
                     array_push($this->handlers, $handler);
                 }
-            }
+            // }
         }
     }
 

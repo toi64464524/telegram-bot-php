@@ -45,11 +45,14 @@ class KeyboardMarkup
     public function make()
     {
         $keyboard = [];
+        
         foreach ($this->rows as $row) {
             $keyboard_row = [];
-            foreach ($row as $button) {
-                if ($button) {
-                    array_push($keyboard_row, $button);
+            foreach ($row as $buttons) {
+                foreach($buttons as $button) {
+                    if ($button && $button->make()) {
+                        array_push($keyboard_row, $button->make());
+                    }
                 }
             }
 
@@ -57,7 +60,6 @@ class KeyboardMarkup
                 array_push($keyboard, $keyboard_row);
             }
         }
-
         $reply_markup = array('keyboard' => $keyboard, 'one_time_keyboard'=>$this->one_time_keyboard, 'resize_keyboard' => $this->resize_keyboard, 'is_persistent'=> $this->is_persistent);
         return json_encode($reply_markup);
     }

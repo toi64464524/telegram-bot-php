@@ -68,6 +68,10 @@ class InlineCallbackKeyboardButton {
         }
     }
 
+    public function make():array
+    {
+        return $this->data;
+    }
     public function delete()
     {
         $this->data = [];

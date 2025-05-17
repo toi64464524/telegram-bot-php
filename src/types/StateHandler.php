@@ -18,7 +18,7 @@ class StateHandler
         $this->entry_point_handlers =[];
         $this->state_handlers =[];
         $this->fallback_handlers =[];
-        $this->state_data = [];
+        $this->state_data = []; // 存储状态
 
         if ($state_type && $state_type !== self::USER_STATE && $state_type !== self::CHAT_STATE) {
             throw new \Exception('缓存类型错误');
@@ -70,6 +70,5 @@ class StateHandler
                 unset($this->state_data[$id]);
             }
         }
-
     }
 }

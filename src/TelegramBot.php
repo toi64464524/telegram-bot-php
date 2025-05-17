@@ -85,7 +85,6 @@ class TelegramBot extends Api
         if ($markup){
             $params['reply_markup'] = $markup->make();
         }
-        // dd($params);
         return parent::sendMessage($params);
     }
 
@@ -124,8 +123,9 @@ class TelegramBot extends Api
         } else if ($handlers instanceof MessageHandlers) {
             $this->handlers = array_merge($this->handlers, $handlers->handlers);
         } else if ($handlers instanceof MiddlewareHandlers) {
-            $this->handlers = array_merge($this->middleware_handlers, $handlers->handlers);
+            $this->middleware_handlers = array_merge($this->middleware_handlers, $handlers->handlers);
         }
+        
         usort($this->middleware_handlers, function($a, $b) {
             return $a->group <=> $b->group; 
         });
@@ -167,92 +167,79 @@ class TelegramBot extends Api
         }
     }
 
+    // 没有返回值或者返回值是 false 就停止后续控制器业务
     public function exec_handlers(Update $update)
     {
-        $group = null;
-        $id = null;
-        if ($this->middleware_handlers) {
-            foreach ($this->middleware_handlers as $handler) {
-                $filters = $handler->filters;
-                $method = $handler->handler;
-                // var_dump("匹配 middleware_handlers 消息： ", $filters->filters, $method, $filters->handler($update));
-                if($filters->handler($update)) {
-                    $state = call_user_func($method, $this, $update);
-                    // 如果中间件 没有返回true 就停止处理
-                    if (!$state) {
-                        return;
-                    }
-                }
-            }
-        }
-
+        $state_id = null;
         if ($this->state_handler) {
             $state_type = $this->state_handler->state_type;
-            $id = $state_type === StateHandler::CHAT_STATE ? $update->getChat()->id : (StateHandler::USER_STATE ?  $update->getFrom()->id : null);
-            $state_data = $this->state_handler->get_state_date($id);
-            // echo("\n{$id} 当前管理状态：{$state_data}  {$state_type}\n");
-
-            // 如果没有开启状态先匹配下是否要开启状态
-            if ($id && !$state_data) {
-                foreach ($this->state_handler->entry_point_handlers as $handler) {
-                    $filters = $handler->filters;
-                    $method = $handler->handler;
-                    var_dump("匹配 entry_point_handlers 消息： ", $filters->filters, $method, $filters->handler($update));
-                    if($filters->handler($update)) {
-                        $state = call_user_func($method, $this, $update);
-                        var_dump("执行返回结果: {$state}");
-                        return $this->state_handler->save_state_data($id, $state);
-                    }
-                }
-            }
-
-            // 如果已经开启了状态了
-            if ($id && $state_data) {
-                // 先匹配是否关闭的处理器
-                foreach ($this->state_handler->fallback_handlers as $handler) {
-                    $filters = $handler->filters;
-                    $method = $handler->handler;
-                    var_dump("匹配 fallback_handlers 消息： ", $filters->filters, $method, $filters->handler($update));
-                    if($filters->handler($update)) {
-                        $user_data[$update->getFromId()] = [];
-                        $state = call_user_func($method, $this, $update);
-                        var_dump("执行返回结果: {$state}");
-                        return $this->state_handler->save_state_data($id, null);
-                    }
-                }
-
-                // 在匹配状态的处理方法
-                foreach ($this->state_handler->state_handlers[$state_data] as $handler) {
-                    $filters = $handler->filters;
-                    $method = $handler->handler;
-                    var_dump("匹配 state_handlers 消息： ", $filters->filters, $method, $filters->handler($update));
-                    if($filters->handler($update)) {
-                        $user_data[$update->getFromId()] = [];
-                        $state = call_user_func($method, $this, $update);
-                        var_dump("执行返回结果: {$state}");
-                        return $this->state_handler->save_state_data($id, $state);
-                    }
-                }
-                // 保持状态
-                return;
-            }
+            $state_id = $state_type === StateHandler::CHAT_STATE ? $update->getChat()->id : (StateHandler::USER_STATE ?  $update->getFrom()->id : null);
         }
         
+        // 中间件控制器
+        var_dump("匹配中间件控制器");
+        $state = $this->_handler_handlers($update, $this->middleware_handlers, $state_id);
+        if ($state) {
+            return;
+        }
+
+        // 状态控制器
+        if ($state_id) {
+            var_dump("匹配状态控制器");
+            $state_data = $this->state_handler->get_state_date($state_id);
+            // 如果没有开启状态先匹配下 是否要开启状态
+            if (!$state_data) {
+                $state = $this->_handler_handlers($update, $this->state_handler->entry_point_handlers, $state_id);
+                if ($state) {
+                    return $this->state_handler->save_state_data($state_id, $state);
+                }
+            } else if ($state_data) { // 如果已经开启了状态了
+                // 先匹配是否关闭的处理器
+                $state = $this->_handler_handlers($update, $this->state_handler->fallback_handlers, $state_id);
+                if ($state) {
+                    return $this->state_handler->save_state_data($state_id, null);
+                }
+
+                $state_handlers = $this->state_handler->state_handlers[$state_data];
+                // 在匹配状态的处理方法
+                $state = $this->_handler_handlers($update, $state_handlers, $state_id);
+                if ($state) {
+                    return $this->state_handler->save_state_data($state_id, $state);
+                }
+                // 停止普通方法的匹配
+                return null;
+            }
+        }
+
+        var_dump("匹配普通控制器");
         // 最后在匹配普通的状态
-        foreach ($this->handlers as $handler) {
+        $state = $this->_handler_handlers($update, $this->handlers, $state_id);
+        if ($state) {
+            return $this->state_handler->save_state_data($state_id, $state);
+        }
+    }
+
+    // 循环匹配处理器
+    private function _handler_handlers(Update $update, array $handlers, int $state_id=null)
+    {
+        foreach ($handlers as $handler) {
             $filters = $handler->filters;
             $method = $handler->handler;
-            // var_dump("匹配普通的状态: ", $filters->filters, $method, $filters->handler($update));
-            if (($group === null || $group < $handler->group) && $filters->handler($update)) {
-                $group = $handler->group;
-                $result = call_user_func($method, $this, $update);
-                if ($result) {
-                    if ($id && $this->state_handler && $result === StateHandler::END) {
-                        $this->state_handler->save_state_data($id, $result);
-                    }
-                    break;
+            if($filters->handler($update)) {
+                var_dump("循环控制器");
+                // 匹配成功返回执行结果  后续根据返回结果决定是否继续执行其他控制器
+                $state = call_user_func($method, $this, $update);
+                // 如果控制器有返回值 true 就停止
+                if ($state) {
+                    if ($state_id && $state === StateHandler::END) {
+                        $this->state_handler->save_state_data($state_id, null);
+                    } 
+                    return $state;
                 }
             }
         }
+
+        // 未匹配 继续其他控制器
+        return null;
     }
 }
