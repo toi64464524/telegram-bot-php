@@ -125,7 +125,6 @@ class TelegramBot extends Api
     public function add_handlers(Handlers $handlers)
     {
         foreach ($handlers->handlers as $handler) {
-            var_dump($handler);
             $this->add_handler($handler);
         }
     }

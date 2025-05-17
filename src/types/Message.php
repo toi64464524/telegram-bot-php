@@ -43,7 +43,7 @@ class Message extends BaseMessage
 
     public function getText() : string
     {
-        return $this->getMessage()->text;
+        return $this->text;
     }
 
     /**
