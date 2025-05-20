@@ -1,9 +1,8 @@
 <?php
 
-namespace telegram\bot\types;
+namespace Telegram\Bot\Handlers;
 
-// use App\Bot\Types\KeyboardHandler;
-// use App\Bot\Types\KeyboardMarkup;
+use Telegram\Bot\Types\Filters;
 
 class KeyboardHandlers extends Handlers
 {

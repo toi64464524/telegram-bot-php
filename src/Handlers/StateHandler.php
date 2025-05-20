@@ -1,6 +1,8 @@
 <?php
 
-namespace telegram\bot\types;
+namespace Telegram\Bot\Handlers;
+
+use Telegram\Bot\Types\Filters;
 
 class StateHandler
 {

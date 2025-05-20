@@ -1,27 +1,25 @@
 <?php
 
-namespace telegram\bot;
+namespace Telegram\Bot;
 
 use Telegram\Bot\Api;
-
-use telegram\bot\types\Update;
-use telegram\bot\types\Filters;
-use telegram\bot\types\Handlers;
-use telegram\bot\types\InlineCallbackHandler;
-use telegram\bot\types\InlineCallbackHandlers;
-use telegram\bot\types\MessageHandler;
-use telegram\bot\types\MessageHandlers;
-use telegram\bot\types\KeyboardHandler;
-use telegram\bot\types\KeyboardHandlers;
-use telegram\bot\types\CommandHandler;
-use telegram\bot\types\CommandHandlers;
-use telegram\bot\types\MiddlewareHandler;
-use telegram\bot\types\MiddlewareHandlers;
-use telegram\bot\types\StateHandler;
-use telegram\bot\types\InlineCallbackKeyboardMarkup;
-use telegram\bot\types\KeyboardMarkup;
-// use Illuminate\Support\Facades\Log;
-
+use Telegram\Bot\Types\Update;
+use Telegram\Bot\Types\Filters;
+use Telegram\Bot\Types\InputMessage;
+use Telegram\Bot\Markups\InlineCallbackKeyboardMarkup;
+use Telegram\Bot\Markups\KeyboardMarkup;
+use Telegram\Bot\Handlers\StateHandler;
+use Telegram\Bot\Handlers\InlineCallbackHandler;
+use Telegram\Bot\Handlers\InlineCallbackHandlers;
+use Telegram\Bot\Handlers\CommandHandler;
+use Telegram\Bot\Handlers\CommandHandlers;
+use Telegram\Bot\Handlers\MiddlewareHandler;
+use Telegram\Bot\Handlers\MiddlewareHandlers;
+use Telegram\Bot\Handlers\Handlers;
+use Telegram\Bot\Handlers\MessageHandler;
+use Telegram\Bot\Handlers\MessageHandlers;
+use Telegram\Bot\Handlers\KeyboardHandler;
+use Telegram\Bot\Handlers\KeyboardHandlers;
 
 class TelegramBot extends Api
 {
@@ -51,6 +49,12 @@ class TelegramBot extends Api
     public function __init() 
     {
         // 让子类定义
+    }
+
+    public function send(int $chat_id, InputMessage $message)
+    {
+        $params = $message->make($chat_id);
+        return parent::sendMessage($params);
     }
 
     public function edit_message(int $chat_id, int $message_id, array $params)

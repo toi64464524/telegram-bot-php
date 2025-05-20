@@ -1,5 +1,5 @@
 <?php
-namespace telegram\bot\types;
+namespace Telegram\Bot\Types;
 
 use Telegram\Bot\Api;
 use Telegram\Bot\Objects\Message as BaseMessage;
@@ -28,7 +28,7 @@ class Message extends BaseMessage
 
     public function getId(): int
     {
-        return $this->getMessage()->message_id;
+        return $this->message_id;
     }
 
     public function getChatId(): int

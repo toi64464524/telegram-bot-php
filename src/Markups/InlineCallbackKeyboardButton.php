@@ -1,6 +1,8 @@
 <?php
 
-namespace telegram\bot\types;
+namespace Telegram\Bot\Markups;
+
+use Telegram\Bot\Types\InputCallbackData;
 
 class InlineCallbackKeyboardButton {
     public array $data;
@@ -15,10 +17,12 @@ class InlineCallbackKeyboardButton {
                 throw new \Exception("url 只能是字符串");
             }
         } else if(isset($params['callback_data'])) {
-            if (is_string($params['callback_data'])){
+            if ($params['callback_data'] instanceof InputCallbackData) {
+                $this->data['callback_data'] = $params['callback_data']->make();
+            } else if (is_string($params['callback_data'])) {
                 $this->data['callback_data'] = $params['callback_data'];
             }else{
-                throw new \Exception("callback_data 只能是字符串");
+                throw new \Exception("callback_data 只能是字符串或者数组");
             }
         } else if(isset($params['login_url'])) {
             if (is_array($params['login_url'])) {

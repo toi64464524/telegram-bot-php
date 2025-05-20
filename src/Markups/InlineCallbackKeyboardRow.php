@@ -1,14 +1,14 @@
 <?php
 
-namespace telegram\bot\types;
+namespace Telegram\Bot\Markups;
 
-class KeyboardRow {
+class InlineCallbackKeyboardRow {
     public array $row;
 
     public function __construct(array $buttons)
     {
         foreach ($buttons as $button) {
-            if (!$button instanceof KeyboardButton) {
+            if (!$button instanceof InlineCallbackKeyboardButton) {
                 throw new \Exception('按键类型错误');
             }
         }
@@ -16,7 +16,7 @@ class KeyboardRow {
         $this->row = $buttons;
     }
 
-    public function add_button(KeyboardButton $button)
+    public function add_button(InlineCallbackKeyboardButton $button)
     {
         array_push($this->row, $button);
     }

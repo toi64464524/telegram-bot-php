@@ -1,6 +1,6 @@
 <?php
 
-namespace telegram\bot;
+namespace Telegram\Bot;
 
 use Swoole\Process;
 use Swoole\Timer;
@@ -18,7 +18,9 @@ class TelegramBotManager
     /**
      * 初始化方法（预留，暂无逻辑）
      */
-    public function _init() {}
+    public function _init() {
+        // 让子类定义
+    }
 
     /**
      * 添加一个 Bot 到管理器
@@ -27,9 +29,13 @@ class TelegramBotManager
      */
     public function add(TelegramBot $telegram_bot): int
     {
-        $id = $telegram_bot->id;
-        $this->bots[$id] = $telegram_bot;
-        return $id;
+        $bot_id = $telegram_bot->id;
+        if (isset($this->bots[$bot_id])) {
+            $this->stop($bot_id);
+        }
+        
+        $this->bots[$bot_id] = $telegram_bot;
+        return $bot_id;
     }
 
     /**
@@ -118,6 +124,7 @@ class TelegramBotManager
      */
     public function run(): void
     {
+        $this->_init();
         // 启动所有已注册的 Bot
         foreach (array_keys($this->bots) as $id) {
             $this->start($id);

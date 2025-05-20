@@ -1,5 +1,5 @@
 <?php
-namespace telegram\bot\types;
+namespace Telegram\Bot\Types;
 
 use Telegram\Bot\Objects\Update as BaseUpdate;
 use Illuminate\Support\Collection;
@@ -70,16 +70,9 @@ class Update extends BaseUpdate
      * 返回数组 数组中有 command 和 args[]
      * 
      */
-    public function getCallbackData() : Collection
+    public function getCallbackData() : CallbackData
     {
-        $arr= preg_split('/[| ,:]+/', $this->getCallbackQuery()->data ?? '');
-        if ($arr && $arr[0]) {
-            return collect([
-                'command'=> $arr[0],
-                'args'=> array_values(array_slice($arr, 1))
-            ]);
-        }
-        return new Collection();;
+        return new CallbackData($this->getCallbackQuery());
     }
 
     public function getMessage() : Collection

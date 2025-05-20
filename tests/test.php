@@ -2,20 +2,20 @@
 
 require __DIR__ . '/../vendor/autoload.php';
 
-use telegram\bot\TelegramBot;
-use telegram\bot\types\Filters;
-use telegram\bot\types\MessageHandler;
-use telegram\bot\types\MessageHandlers;
-use telegram\bot\types\MiddlewareHandlers;
-use telegram\bot\types\MiddlewareHandler;
-use telegram\bot\types\InlineCallbackKeyboardButton;
-use telegram\bot\types\InlineCallbackKeyboardRow;
-use telegram\bot\types\InlineCallbackKeyboardMarkup;
-use telegram\bot\types\InlineCallbackHandler;
-use telegram\bot\types\InlineCallbackHandlers;
-use telegram\bot\types\KeyboardHandlers;
-use telegram\bot\types\KeyboardHandler;
-use telegram\bot\types\StateHandler;
+use Telegram\Bot\TelegramBot;
+use Telegram\Bot\Types\Filters;
+use Telegram\Bot\Markups\InlineCallbackKeyboardButton;
+use Telegram\Bot\Markups\InlineCallbackKeyboardRow;
+use Telegram\Bot\Markups\InlineCallbackKeyboardMarkup;
+use Telegram\Bot\Handlers\MessageHandler;
+use Telegram\Bot\Handlers\MessageHandlers;
+use Telegram\Bot\Handlers\MiddlewareHandlers;
+use Telegram\Bot\Handlers\MiddlewareHandler;
+use Telegram\Bot\Handlers\InlineCallbackHandler;
+use Telegram\Bot\Handlers\InlineCallbackHandlers;
+use Telegram\Bot\Handlers\KeyboardHandlers;
+use Telegram\Bot\Handlers\KeyboardHandler;
+use Telegram\Bot\Handlers\StateHandler;
 
 $botton = new InlineCallbackKeyboardButton('text', ['callback_data' =>'123']);
 

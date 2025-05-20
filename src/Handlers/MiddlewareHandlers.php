@@ -1,6 +1,6 @@
 <?php
 
-namespace telegram\bot\types;
+namespace Telegram\Bot\Handlers;
 
 class MiddlewareHandlers extends Handlers
 {
