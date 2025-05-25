@@ -2,7 +2,7 @@
 
 namespace Telegram\Bot\Handlers;
 
-use Telegram\Bot\Types\Filters;
+use Telegram\Bot\Filters\Filters;
 
 class CommandHandler
 {
@@ -12,11 +12,10 @@ class CommandHandler
     public Filters $filters;
     public $handler;
 
-    public function __construct(string $command, string $description, callable $handler, int $group=0) {
+    public function __construct(string $command, callable $handler, int $group=0) {
         $this->command = $command;
-        $this->description = $description;
         $this->handler = $handler;
         $this->group = $group;
-        $this->filters = new Filters(['is_command', "/^\/{$command}$/"]);
+        $this->filters = new Filters(["/{$command}/", "&", "command_message"]);
     }
 }

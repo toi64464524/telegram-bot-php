@@ -2,7 +2,7 @@
 
 namespace Telegram\Bot\Handlers;
 
-use Telegram\Bot\Types\Filters;
+use Telegram\Bot\Filters\Filters;
 
 class MessageHandler
 {
@@ -14,6 +14,6 @@ class MessageHandler
         $this->group = $group;
         $this->filters = $filters;
         $this->handler = $handler;
-        $this->filters->add(['is_message']);
+        $this->filters->add(['message']);
     }
 }

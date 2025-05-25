@@ -2,7 +2,7 @@
 
 namespace Telegram\Bot\Handlers;
 
-use Telegram\Bot\Types\Filters;
+use Telegram\Bot\Filters\Filters;
 
 class InlineCallbackHandler
 {
@@ -14,7 +14,7 @@ class InlineCallbackHandler
 
     public function __construct(Filters $filters, callable $handler=null, int $group=0)
     {
-        $filters->add(['is_inline_callback']);
+        $filters->add(['inline_callback_message']);
         $this->group = $group;
         $this->filters = $filters;
         $this->handler = $handler;

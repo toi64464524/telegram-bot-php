@@ -2,7 +2,10 @@
 
 namespace Telegram\Bot\Handlers;
 
-class Handlers
+use IteratorAggregate;
+use ArrayIterator;
+
+class Handlers implements IteratorAggregate
 {
     public array $handlers;
 
@@ -13,11 +16,13 @@ class Handlers
         }
     }
 
-    public function add(MiddlewareHandler|CommandHandler|InlineCallbackHandler|KeyboardHandler|StateHandler $handler) 
+    public function add(MiddlewareHandler|CommandHandler|InlineCallbackHandler|KeyboardHandler|StateHandler|MessageHandler $handler) 
     {
-        if (!$handler instanceof MiddlewareHandler && !$handler instanceof CommandHandler && !$handler instanceof InlineCallbackHandler && !$handler instanceof KeyboardHandler && !$handler instanceof StateHandler) {
-            throw new \Exception("处理器类型错误"); 
-        }
         array_push($this->handlers, $handler);
+    }
+
+    // 👇 实现 IteratorAggregate 接口，支持 foreach 遍历
+    public function getIterator(): ArrayIterator {
+        return new ArrayIterator($this->handlers);
     }
 }

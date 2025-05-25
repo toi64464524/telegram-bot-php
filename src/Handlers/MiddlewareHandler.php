@@ -2,7 +2,7 @@
 
 namespace Telegram\Bot\Handlers;
 
-use Telegram\Bot\Types\Filters;
+use Telegram\Bot\Filters\Filters;
 
 class MiddlewareHandler
 {
@@ -12,7 +12,7 @@ class MiddlewareHandler
 
     public function __construct(callable $handler, int $group=-1) {
         $this->group = $group;
-        $this->filters = new Filters();
+        $this->filters = new Filters(['all']);
         $this->handler = $handler;
     }
 }

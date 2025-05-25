@@ -2,7 +2,7 @@
 
 namespace Telegram\Bot\Handlers;
 
-use Telegram\Bot\Types\Filters;
+use Telegram\Bot\Filters\Filters;
 
 class StateHandler
 {
