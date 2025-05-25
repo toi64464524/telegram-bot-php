@@ -16,7 +16,7 @@ class Handlers implements IteratorAggregate
         }
     }
 
-    public function add(MiddlewareHandler|CommandHandler|InlineCallbackHandler|KeyboardHandler|StateHandler|MessageHandler $handler) 
+    public function add(Handler|MiddlewareHandler|CommandHandler|InlineCallbackHandler|KeyboardHandler|StateHandler|MessageHandler $handler) 
     {
         array_push($this->handlers, $handler);
     }
