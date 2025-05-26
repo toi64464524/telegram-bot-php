@@ -11,6 +11,7 @@ class Handler
     public $handler;
 
     public function __construct(Filters $filters, callable $handler, int $group=0) {
+        $this->filters = $filters;
         $this->group = $group;
         $this->handler = $handler;
     }

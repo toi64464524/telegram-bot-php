@@ -71,6 +71,7 @@ class Filters
         $and = false;
         $or = false;
         $res = true;
+        var_dump(json_encode($this->filters));
         foreach($this->filters as $filter) {
             if ($filter === '!') {
                 $reverse = true;
@@ -83,8 +84,6 @@ class Filters
                 $or = true;
                 $and = false;
             } else {
-
-            // } else if (isset($this->map[$filter]) && method_exists($this->map[$filter][0], $this->map[$filter][1])) {
                 if (@preg_match($filter, '') !== false) {
                     $result = call_user_func($this->map['regex'], $update, trim($filter));
                 } else {
@@ -107,7 +106,7 @@ class Filters
                 $or = false;
             }
         }
-
+        
         return $res;
     }
 

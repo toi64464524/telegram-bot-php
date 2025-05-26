@@ -66,7 +66,7 @@ class Chat
      */
     public static function left_chat(Update $update): bool
     {
-        if ($update->isType('my_chat_member')) {
+        if (!$update->isType('my_chat_member')) {
             return false;
         }
 
@@ -83,7 +83,7 @@ class Chat
      * @param Update $update Telegram 更新对象
      * @return bool 如果是命令消息返回 true，否则返回 false
      */
-    public static function chat_admin_changed(Update $update): bool
+    public static function chat_right_changed(Update $update): bool
     {
         if (!$update->isType('my_chat_member')) {
             return false;

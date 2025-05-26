@@ -16,13 +16,13 @@ class StateHandler
     public array $state_data;
     public string $state_type;
 
-    public function  __construct(array $entry_points, array $states, array $fallback_handlers, string $state_type=null) {
+    public function  __construct(array $entry_points, array $states, array $fallback_handlers, string $state_type=self::CHAT_STATE) {
         $this->entry_point_handlers =[];
         $this->state_handlers =[];
         $this->fallback_handlers =[];
         $this->state_data = []; // 存储状态
 
-        if ($state_type && $state_type !== self::USER_STATE && $state_type !== self::CHAT_STATE) {
+        if ($state_type !== self::USER_STATE && $state_type !== self::CHAT_STATE) {
             throw new \Exception('缓存类型错误');
         }
 
@@ -53,6 +53,11 @@ class StateHandler
         }
     }
 
+    /**
+     * 获取状态处理器
+     * @param string $state 状态名称
+     * @return array|null 返回状态状态或null
+     */
     public function get_state_date($id): string|null
     {
         if (isset($this->state_data[$id])){
@@ -61,7 +66,13 @@ class StateHandler
         return null;
     }
 
-    public function save_state_data(int $id, $state=null)
+    /**
+     * 保存状态数据
+     * @param int $id 用户或聊天ID
+     * @param string|null $state 状态名称或结束状态
+     * @return bool 成功返回true，失败返回false
+     */
+    public function save_state_data(int $id, string $state=null): bool
     {
         if ($state === self::END && isset($this->state_data[$id])) {
             unset($this->state_data[$id]);
@@ -72,5 +83,6 @@ class StateHandler
                 unset($this->state_data[$id]);
             }
         }
+        return true;
     }
 }

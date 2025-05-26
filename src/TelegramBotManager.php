@@ -125,6 +125,7 @@ class TelegramBotManager
     public function run(): void
     {
         $this->_init();
+        
         // 启动所有已注册的 Bot
         foreach (array_keys($this->bots) as $id) {
             $this->start($id);
