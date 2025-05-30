@@ -29,7 +29,7 @@ class TelegramBotManager
      */
     public function add(TelegramBot $telegram_bot): int
     {
-        $bot_id = $telegram_bot->id;
+        $bot_id = $telegram_bot->getId();
         if (isset($this->bots[$bot_id])) {
             $this->stop($bot_id);
         }
@@ -106,7 +106,7 @@ class TelegramBotManager
      * 监控所有 Bot 进程状态（自动重启崩溃的进程）
      * @param int $interval 监控间隔（毫秒）
      */
-    private function _monitor(int $interval = 5000): void
+    private function monitor(int $interval = 5000): void
     {
         Timer::tick($interval, function () {
             foreach ($this->processes as $id => $pid) {
@@ -132,7 +132,7 @@ class TelegramBotManager
         }
 
         // 开启监控
-        $this->_monitor();
+        $this->monitor();
 
         // 保持主进程运行（事件循环）
         Event::wait();

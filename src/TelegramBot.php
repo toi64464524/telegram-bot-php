@@ -21,23 +21,30 @@ use Telegram\Bot\Handlers\MessageHandler;
 use Telegram\Bot\Handlers\MessageHandlers;
 use Telegram\Bot\Handlers\KeyboardHandler;
 use Telegram\Bot\Handlers\KeyboardHandlers;
+use Telegram\Bot\Laravel\Facades\Telegram;
 
 class TelegramBot extends Api
 {
-    public ?KeyboardMarkup $keyboard_markup= null;
-    public ?StateHandler $state_handler= null;
+    // 中间件控制器 最先执行
     public array $middleware_handlers=[];
+    // 命令控制器
     public array $command_handlers=[];
+    // 状态控制器
+    public ?StateHandler $state_handler= null;
+    // 普通处理器
     public array $handlers=[];
+    // 窗口数据缓存
     private array $chat_data= [];
+    // 用户数据缓存
     private array $user_data= [];
     private int $max_update_id=0;
     private int $id;
     private string $token;
+    private ?TelegramBotText $text = null;
 
-    public function __construct(string $token)
+    public function __construct(string $token, bool $async = false, $httpClientHandler = null, string $baseBotUrl = null)
     {
-        parent::__construct($token);
+        parent::__construct($token, $async, $httpClientHandler, $baseBotUrl);
         $this->id = (int) explode(":", $token)[0];
         $this->token = $token;
     }
@@ -65,13 +72,39 @@ class TelegramBot extends Api
     }
 
     /**
+     * 获取当前机器人的文本
+     * @return TelegramBotText 返回文本对象
+     */
+    public function setText(string $lang, array $text)
+    {
+        if (!$this->text) {
+            $this->text = new TelegramBotText($this->id);
+        }
+        $this->text->addLang($lang, $text);
+        return $this->text;
+    }
+
+    /**
+     * 获取当前机器人的文本
+     * @return TelegramBotText 返回文本对象
+     */
+    public function getText(string $lang, string $key, array $replacements): string
+    {
+        if (!$this->text) {
+            return $key;
+        }
+
+        return $this->text->get($lang, $key, $replacements);
+    }
+    
+    /**
      * 设置窗口数据缓存
      * @param int $chat_id 聊天ID
      * @param string $key 缓存键
      * @param mixed $data 缓存数据
      * @return bool 返回是否设置成功
      */
-    protected function setChatData(int $chat_id, string $key, mixed $data) :bool
+    public function setChatData(int $chat_id, string $key, mixed $data) :bool
     {
         $this->chat_data[$chat_id] = $data;
         return true;
@@ -84,7 +117,7 @@ class TelegramBot extends Api
      * @param mixed $data 缓存数据
      * @return array 返回聊天数据
      */
-    protected function getChatData(int $chat_id, string $key, mixed $data): mixed
+    public function getChatData(int $chat_id, string $key, mixed $data): mixed
     {
         return $this->chat_data[$chat_id] ?? null;
     }
@@ -96,7 +129,7 @@ class TelegramBot extends Api
      * @param mixed $data 缓存数据
      * @return bool 返回是否设置成功
      */
-    protected function setUserData(int $user_id, string $key, mixed $data): bool
+    public function setUserData(int $user_id, string $key, mixed $data): bool
     {
         $this->user_data[$user_id] = $data;
         return true;
@@ -108,7 +141,7 @@ class TelegramBot extends Api
      * @param string $key 缓存键
      * @return array 返回用户数据
      */
-    protected function getUserData(int $user_id): mixed
+    public function getUserData(int $user_id): mixed
     {
         return $this->user_data[$user_id] ?? null;
     }
@@ -126,7 +159,7 @@ class TelegramBot extends Api
      * 获取当前机器人的ID
      * @return int 返回机器人的ID
      */
-    protected function getId(): int
+    public function getId(): int
     {
         return $this->id;
     }
@@ -135,7 +168,7 @@ class TelegramBot extends Api
      * 获取当前机器人的Token
      * @return string 返回机器人的Token
      */
-    protected function getToken(): string
+    public function getToken(): string
     {
         return $this->token;
     }
@@ -147,9 +180,9 @@ class TelegramBot extends Api
      * @return mixed 返回发送消息的结果
      * @throws \Telegram\Bot\Exceptions\TelegramSDKException
      */
-    protected function send_message(int $chat_id, InputMessage $message)
+    public function send_message(InputMessage $message)
     {
-        $params = $message->make($chat_id);
+        $params = $message->make($message->getChatId());
         return parent::sendMessage($params);
     }
 
@@ -161,7 +194,7 @@ class TelegramBot extends Api
      * @return mixed 返回编辑消息的结果
      * @throws \Telegram\Bot\Exceptions\TelegramSDKException
      */
-    protected function edit_message(int $chat_id, int $message_id, array $params)
+    public function edit_message(int $chat_id, int $message_id, array $params)
     {
         $params['chat_id'] = $chat_id;
         $params['message_id'] = $message_id;
@@ -176,7 +209,7 @@ class TelegramBot extends Api
      * @return void
      * @throws \Telegram\Bot\Exceptions\TelegramSDKException
      */
-    protected function delete_message(int $chat_id, int $message_id)
+    public function delete_message(int $chat_id, int $message_id)
     {
         $params = [
             'chat_id' => $chat_id,
@@ -205,7 +238,7 @@ class TelegramBot extends Api
      * @return mixed 返回发送消息的结果
      * @throws \Telegram\Bot\Exceptions\TelegramSDKException
      */
-    protected function send_message_text(string|int $chat_id, string $text, array $params=[], InlineCallbackKeyboardMarkup|KeyboardMarkup $markup=null)
+    public function send_message_text(string|int $chat_id, string $text, array $params=[], InlineCallbackKeyboardMarkup|KeyboardMarkup $markup=null)
     {
         $params['chat_id'] = $chat_id;
         $params['text'] = $text;
@@ -217,7 +250,7 @@ class TelegramBot extends Api
     }
 
     // 添加处理器
-    protected function add_handler(Handler|MiddlewareHandler|StateHandler|InlineCallbackHandler|MessageHandler|KeyboardHandler|CommandHandler $handler)
+    protected function add_handler(StateHandler|Handler $handler)
     {
         if ($handler instanceof CommandHandler) {
             array_push($this->command_handlers, $handler);
@@ -242,11 +275,11 @@ class TelegramBot extends Api
         }
 
         usort($this->middleware_handlers, function($a, $b) {
-            return $a->group <=> $b->group;
+            return $a->getGroup() <=> $b->getGroup();
         });
 
         usort($this->handlers, function($a, $b) {
-            return $a->group <=> $b->group; 
+            return $a->getGroup() <=> $b->getGroup(); 
         });
     }
 
@@ -258,6 +291,13 @@ class TelegramBot extends Api
         }
     }
     
+    /**
+     * 获取更新列表
+     * @param array $options 选项数组
+     * @param bool $shouldDispatchEvents 是否分发事件
+     * @return Update[] 返回更新列表
+     * @throws \Telegram\Bot\Exceptions\TelegramSDKException
+     */
     public function getUpdates(array $options = [], bool $shouldDispatchEvents = true): array
     {
         $response = $this->get('getUpdates', $options);
@@ -273,12 +313,20 @@ class TelegramBot extends Api
             ->all();
     }
 
-    // 循环处理消息
+    /**
+     * 运行机器人
+     * @param array $options 选项数组
+     * @return void
+     * @throws \Exception
+     */
     public function run(array $options=[])
     {
-        $this->add_handler($this->setStateHandler());
-        $this->add_handlers($this->seteHandler());
+        $state_handler = $this->setStateHandler();
+        $handler = $this->setHandler();
+        $state_handler && $this->add_handler($state_handler);
+        $handler && $this->add_handlers($handler);
         $this->init();
+
         empty($options['limit']) && $options['limit'] = 100;
         empty($options['offset']) && $options['offset'] = 1;
         while(True) {
@@ -296,7 +344,12 @@ class TelegramBot extends Api
         }
     }
 
-    // 没有返回值或者返回值是 false 就停止后续控制器业务
+    /**
+     * 执行处理器
+     * @param Update $update 更新对象
+     * @return void
+     * @throws \Exception
+     */
     private function exec_handlers(Update $update)
     {
         $state_id = null;
@@ -355,15 +408,24 @@ class TelegramBot extends Api
         }
     }
 
-    // 循环匹配处理器
+    /**
+     * 循环匹配处理器
+     * @param Update $update 更新对象
+     * @param array $handlers 处理器数组
+     * @param int|null $state_id 状态ID
+     * @return mixed 返回状态字符串 或控制器执行结果 或 null 没有匹配到或者需要继续执行都返回null
+     * @throws \Exception
+     */
     private function handler_handlers(Update $update, array $handlers, int $state_id=null)
     {
         foreach ($handlers as $handler) {
-            $filters = $handler->filters;
-            $method = $handler->handler;
+            $filters = $handler->getFilters();
+            $method = $handler->getHandler();
+            // 如果没有设置过滤器，直接执行
             if($filters->handler($update)) {
                 $state = call_user_func($method, $this, $update);
-                if ($state) {
+                if ($state!==null) {
+                    // 如果返回值是字符串，表示状态
                     if ($state_id && $state === StateHandler::END) {
                         $this->state_handler->save_state_data($state_id, null);
                     } 

@@ -4,19 +4,10 @@ namespace Telegram\Bot\Handlers;
 
 use Telegram\Bot\Filters\Filters;
 
-class InlineCallbackHandler
+class InlineCallbackHandler extends Handler
 {
-    public string $command;
-    public int $group;
-    public Filters $filters;
-    public $handler;
-    // public array $button;
-
-    public function __construct(Filters $filters, callable $handler=null, int $group=0)
-    {
+    public function __construct(Filters $filters, callable $handler, int $group=0) {
         $filters->add(['inline_callback_message']);
-        $this->group = $group;
-        $this->filters = $filters;
-        $this->handler = $handler;
+        parent::__construct($filters, $handler, $group);
     }
 }
