@@ -3,7 +3,7 @@
 namespace Telegram\Bot\Filters;
 
 use Telegram\Bot\Exceptions\FilterException;
-use Telegram\Bot\Types\Update;
+use Telegram\Bot\Objects\Update;
 use Telegram\Bot\Filters\Message;
 use Telegram\Bot\Filters\Chat;
 
@@ -16,12 +16,12 @@ class Filters
 {  
     protected $map = [
         'all' => [Filters::class, 'all'], // 全部消息
-
+        'file' => [message::class, 'hasFile'],
         "regex" => [message::class, 'regex'], // 正则表达式匹配
         'message' => [message::class, 'message'], // 消息
-        'text_message' => [message::class, 'text_message'], // 文本消息
-        'photo_message' => [message::class, 'photo_message'], // 命令消息
-        'command_message' => [message::class, 'command_message'], // 命令消息
+        'text_message' => [message::class, 'isTextMessage'], // 文本消息
+        'photo_message' => [message::class, 'isPhotoPessage'], // 命令消息
+        'command_message' => [message::class, 'isCommandMessage'], // 命令消息
         'private_chat_message' => [message::class, 'private_chat_message'], // 消息
         'group_chat_message' => [message::class, 'group_chat_message'], // 消息
         'inline_callback_message' => [message::class, 'inline_callback_message'], // 内联回调消息
@@ -71,7 +71,7 @@ class Filters
         $and = false;
         $or = false;
         $res = true;
-        var_dump(json_encode($this->filters));
+        // var_dump(json_encode($this->filters));
         foreach($this->filters as $filter) {
             if ($filter === '!') {
                 $reverse = true;

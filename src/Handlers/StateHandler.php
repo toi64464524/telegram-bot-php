@@ -58,7 +58,7 @@ class StateHandler
      * @param string $state 状态名称
      * @return array|null 返回状态状态或null
      */
-    public function get_state_date($id): string|null
+    public function get_user_state($id): string|null
     {
         if (isset($this->state_data[$id])){
             return $this->state_data[$id];
@@ -72,7 +72,7 @@ class StateHandler
      * @param string|null $state 状态名称或结束状态
      * @return bool 成功返回true，失败返回false
      */
-    public function save_state_data(int $id, string $state=null): bool
+    public function set_user_state(int $id, string $state=null): bool
     {
         if ($state === self::END && isset($this->state_data[$id])) {
             unset($this->state_data[$id]);
@@ -85,4 +85,13 @@ class StateHandler
         }
         return true;
     }
+
+    public function merge(StateHandler $handler): StateHandler
+    {
+        array_merge($this->entry_point_handlers, $handler->entry_point_handlers);
+        array_merge($this->state_handlers, $handler->state_handlers);
+        array_merge($this->fallback_handlers, $handler->fallback_handlers);
+        return $this;
+    }
+
 }

@@ -36,3 +36,4 @@ Thumbs.db
 .phpunit.result.cache
 tests
 src1
+src2

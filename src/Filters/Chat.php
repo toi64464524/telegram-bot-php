@@ -3,7 +3,7 @@
 namespace Telegram\Bot\Filters;
 
 use Telegram\Bot\Exceptions\FilterException;
-use Telegram\Bot\Types\Update;
+use Telegram\Bot\Objects\Update;
 /**
  * Filters 类用于处理 Telegram Bot 的消息过滤器。
  * 它允许根据不同的条件（如消息类型、正则表达式等）来过滤和处理更新。

@@ -14,6 +14,7 @@ class TelegramBotText
     protected int $telegram_bot_id;
     protected array $langs = [];
     protected array $texts = [];
+
     /**
      * 初始化文本数据
      *
@@ -23,12 +24,18 @@ class TelegramBotText
     public function __construct(int $telegram_bot_id, array $texts = [])
     {
         $this->telegram_bot_id = $telegram_bot_id;
+
         // 如果有传入文本数据，则初始化
         $this->langs = array_map('strtolower', array_keys($texts));
 
         foreach ($texts as $lang => $texts) {
             $this->addLang(strtolower($lang), $texts);
         }
+    }
+
+    public function getLanguages(): array
+    {
+        return array_keys($this->langs);
     }
 
     /**
@@ -64,7 +71,7 @@ class TelegramBotText
         }
 
         $text = $this->langs[$lang][$key];
-
+        $text = str_replace('\n', "\n", $text);
         // 如果没有替换值，直接返回文本
         if (empty($replacements)) {
             return $text;
@@ -76,7 +83,7 @@ class TelegramBotText
             $formattedReplacements["{{{$key}}}"] = $value;
         }
 
-        $text = str_replace('\n', "\n", $text);
+        // $text = str_replace('\n', "\n", $text);
         return strtr($text, $formattedReplacements);
     }
 }
