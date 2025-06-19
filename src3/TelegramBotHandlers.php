@@ -5,7 +5,6 @@ namespace Telegram\Bot;
 use Telegram\Bot\Handlers\Handler;
 use Telegram\Bot\Objects\Update;
 use Telegram\Bot\Objects\UserData;
-use Telegram\Bot\Objects\Message;
 
 /**
  * TelegramBotHandlers TelegramBotHandlers
@@ -154,17 +153,16 @@ class TelegramBotHandlers
     private function execHandlers(Api $telegram, Update $update, array $handlers)
     {   
         $state_id = $this->getStateId($telegram, $update);
+        var_dump("状态id： {$state_id}");
         foreach ($handlers as $handler) {
             $filters = $handler->getFilters();
             $method = $handler->getHandler();
             // 如果没有设置过滤器，直接执行
             if($filters->handler($update)) {
                 $state = call_user_func($method, $telegram, $update);
-                if ($state_id && $state instanceof \Telegram\Bot\Objects\Message) {
-                    $this->chat_last_message[$state_id] = $state;
-                }
                 // 如果返回值是字符串，表示状态
                 if ($state_id && is_string($state)) {
+                    var_dump("控制器返回 {$state}");
                     $this->setState($state_id, $state);
                 }
                 if ($state_id && $state === self::END) {
@@ -227,17 +225,5 @@ class TelegramBotHandlers
         }
         $user_data = $this->user_data[$id];
         return $user_data->get($key);
-    }
-
-    // 获取上一次发送的消息
-    public function getLastMessage(Api $telegram, Update $update) :?Message
-    {
-        $state_id = $this->getStateId($telegram, $update);
-        if ($state_id && isset($this->chat_last_message[$state_id])) {
-            $message = $this->chat_last_message[$state_id];
-            $message->setTelegram($telegram);
-        }
-
-        return null;
     }
 }

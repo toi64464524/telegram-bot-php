@@ -76,15 +76,4 @@ trait Handlers
         }
         return null;
     }
-
-    // 获取上一次发送的消息
-    public function getLastMessage(int $id) :?Message
-    {
-        if (isset($this->handlers->chat_last_message[$id])) {
-            $message = $this->chat_last_message[$id];
-            $message->setTelegram($this);
-        }
-
-        return null;
-    }
 }

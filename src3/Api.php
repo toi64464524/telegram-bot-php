@@ -22,7 +22,7 @@ use Telegram\Bot\Methods\Query;
 use Telegram\Bot\Methods\Stickers;
 use Telegram\Bot\Methods\Update;
 use Telegram\Bot\Methods\Handlers;
-use Telegram\Bot\Methods\StaticResouce;
+use Telegram\Bot\Methods\Text;
 use Telegram\Bot\Traits\CommandsHandler;
 use Telegram\Bot\Traits\HasContainer;
 use Telegram\Bot\Traits\Http;
@@ -55,7 +55,7 @@ class Api
     use Stickers;
     use Update;
     use Handlers;
-    use StaticResouce;
+    use Text;
 
     /** @var string Version number of the Telegram Bot PHP SDK. */
     public const VERSION = '3.12.0';

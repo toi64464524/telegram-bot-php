@@ -6,7 +6,6 @@ use Illuminate\Support\Collection;
 use Telegram\Bot\Objects\Payments\PreCheckoutQuery;
 use Telegram\Bot\Objects\Payments\ShippingQuery;
 use Telegram\Bot\Traits\Telegram;
-use Telegram\Bot\Traits\Resource;
 
 /**
  * Class Update.
@@ -32,7 +31,6 @@ use Telegram\Bot\Traits\Resource;
 class Update extends BaseObject
 {
     use Telegram;
-    use Resource;
 
     /** @var string|null Cached type of thr Update () */
     protected ?string $updateType = null;
