@@ -21,10 +21,8 @@ trait ReplyMessage
     public function replyMessage(array $params): MessageObject
     {
         $params['chat_id'] = $this->getChat()->id;
-        if (!isset($params['reply_to_message']) || $params['reply_to_message']=== true) {
-            $params['reply_to_message_id'] = $this->message_id;
-        }
-
+        $params['reply_to_message_id'] = $this->message_id;
+        
         if (isset($params['photo'])) {
             return $this->getTelegram()->sendPhoto($params);
         } else if (isset($params['text'])) {
@@ -58,10 +56,10 @@ trait ReplyMessage
     {
         $params['chat_id'] =$this->getChat()->id;
         $params['message_id'] = $this->message_id;
-        if (isset($params['text']) && $this->text) {
+
+        if (isset($params['text'])) {
             return $this->getTelegram()->editMessageText($params);
-        } else if (isset($params['caption']) || isset($params['text'])) {
-            $params['caption'] = isset($params['caption']) ? $params['caption'] : $params['text'];
+        } else if (isset($params['caption'])) {
             return $this->getTelegram()->editMessageCaption($params);
         } else if (isset($params['reply_markup'])) {
             return $this->getTelegram()->editMessageReplyMarkup($params);
